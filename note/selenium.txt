@@ -1,0 +1,11 @@
+一：selenium.common.exceptions.WebDriverException: Message: 'geckodriver' executable needs to be in PATH.
+
+找不到geckodriver 的 环境path
+下载 geckodriver 下载地址：https://github.com/mozilla/geckodriver/releases
+下载后（根据系统版本选择）：
+
+    解压取出geckodriver.exe（以64x为例）；
+    将geckodriver.exe放到Firefox的安装目录下，如：（D:\火狐\Mozilla Firefox）；
+    将火狐安装目录（D:\火狐\Mozilla Firefox）添加到环境变量path中
+    重启编译器 
+
