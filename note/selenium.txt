@@ -9,3 +9,15 @@
     将火狐安装目录（D:\火狐\Mozilla Firefox）添加到环境变量path中
     重启编译器 
 
+F12
+ctri+Shift+A
+
+
+find Python Install Path
+sh '''
+	python
+	import sys
+	sys.path
+'''
+
+

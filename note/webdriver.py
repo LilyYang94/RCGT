@@ -334,3 +334,390 @@ m=driver.find_element_by_id("ShippingMethod")
 #再点击下拉框下的选项
 m.find_element_by_xpath("//option[@value='10.69']").click()
 
+
+
+
+分页处理
+对于 web 页面上的分页功能,我们一般做做以下操作:
+ 获取总页数
+ 翻页操作(上一页,下一页)
+
+
+
+
+ 上传文件
+ #定位上传按钮,添加本地文件
+driver.find_element_by_name("file").send_keys('D:\\selenium_use_case\upload
+_file.txt')
+send_keys()方法除可以输入内容外,也可以跟一个本地的文件路径。从而达
+到上传文件的目的。
+
+
+
+调用 JavaScript
+webdriver 提供了 execute_script() 接口用来调用 js 代码。
+#######通过 JS 隐藏选中的元素##########第一种方法:
+#隐藏文字信息
+driver.execute_script('$("#tooltip").fadeOut();')
+time.sleep(5)
+#隐藏按钮:
+button = driver.find_element_by_class_name('btn')
+driver.execute_script('$(arguments[0]).fadeOut()',button)
+
+
+
+
+控制浏览器滚动条
+可以借助 JavaScript
+是来完成操作。
+一般用到操作滚动条的会两个场景:
+ 注册时的法律条文的阅读,判断用户是否阅读完成的标准是:滚动条是否拉到最下方。
+ 要操作的页面元素不在视觉范围,无法进行操作,需要拖动滚动条
+#将页面滚动条拖到底部
+js="var q=document.documentElement.scrollTop=10000"
+driver.execute_script(js)
+time.sleep(3)
+
+
+
+
+
+cookie 处理
+webdriver 可以读取、添加和删除 cookie 信息。
+webdriver 操作 cookie 的方法有:
+ get_cookies()
+ get_cookie(name)
+获得所有 cookie 信息
+返回特定 name 有 cookie 信息
+
+ add_cookie(cookie_dict)
+ delete_cookie(name)
+ delete_all_cookies()
+添加 cookie,必须有 name 和 value 值
+删除特定(部分)的 cookie 信息
+删除所有 cookie 信息
+
+#向 cookie 的 name 和 value 添加会话信息。
+driver.add_cookie({'name':'key-aaaaaaa', 'value':'value-bbbb'})
+#遍历 cookies 中的 name 和 value 信息打印,当然还有上面添加的信息
+for cookie in driver.get_cookies():
+print "%s -> %s" % (cookie['name'], cookie['value'])
+##### 下面可以通过两种方式删除 cookie #####
+# 删除一个特定的 cookie
+driver.delete_cookie("CookieName")
+# 删除所有 cookie
+driver.delete_all_cookies()
+time.sleep(2)
+driver.close()
+
+
+
+获取对象的属性
+# 选择页面上所有的 tag name 为 input 的元素
+inputs = driver.find_elements_by_tag_name('input')
+#然后循环遍历出 data-node 为594434493的元素,单击勾选
+for input in inputs:
+if input.get_attribute('data-node') == '594434493':
+input.click()
+
+
+
+
+
+验证码问题
+记录 cookie
+通过向浏览器中添加 cookie 可以绕过登录的验证码,这是比较有意思的一种解决方案。我们可以在
+用户登录之前,通过 add_cookie()方法将用户名密码写入浏览器 cookie ,再次访问系统登录链接将自
+动登录。例如下
+#访问 xxxx 网站
+driver.get("http://www.xxxx.cn/")
+#将用户名密码写入浏览器 cookie
+driver.add_cookie({'name':'Login_UserNumber', 'value':'username'})
+driver.add_cookie({'name':'Login_Passwd', 'value':'password'})
+#再次访问 xxxx 网站,将会自动登录
+driver.get("http://www.xxxx.cn/")
+使用 cookie 进行登录最大的难点是如何获得用户名密码的 name ,如果找到不到 name 的名字,就没
+办法向 value 中输用户名、密码信息。
+笔者的建议是可以通过 get_cookies()方法来获取登录的所有的 cookie 信息,从而进行找到用户名、
+密码的 name 对象的名字;当然,最简单的方法还是询问前端开发人员。
+
+
+
+
+模块化与类库
+通用的部分可以寫進模塊（類似於一個函數）
+把重复的部分
+写成一个公共的模块,需要的时候进行调用,这样就大大提高了我们编写脚本的效率。
+
+login.py
+#登录模块
+def login():
+driver.find_element_by_id("tbUserName").send_keys("username")
+driver.find_element_by_id("tbPassword").send_keys("456123")
+driver.find_element_by_id("btnLogin").click()
+
+quit.py
+#退出模块
+def
+quit_():
+
+测试用例:
+#coding=utf-8
+from selenium import webdriver
+import login,quit_
+#调用登录、退出模块
+driver = webdriver.Firefox()
+driver.get("http://wwww.xxx.com")
+#调用登录模块
+login.login()
+#其它个性化操作
+......
+#调用退出模块
+quit.quit_()
+
+数据驱动
+参数化,输入数据的不同从而引起输出结果的变化
+
+#coding=utf-8
+from selenium import webdriver
+import time
+values=['selenium','webdriver',u'虫师']
+# 执行循环
+for serch in values:
+driver = webdriver.Firefox()
+driver.get("http://www.xxxx.com")
+driver.find_element_by_id("kw").send_keys(serch)
+time.sleep(3)
+
+
+
+
+Python Class
+在类的方法中必须有个额外的第
+一个参数(self),但在调用类的方法时却不必为这个参数赋值。self 参数所指的是对象本身,所以习惯
+性地命名为 self。
+
+数据驱动(参数化)
+try :
+	print a
+except NameError,msg:
+	print msg
+
+
+
+
+Try...finally...
+
+
+
+
+
+Raise 抛出异常
+
+异常名称 描述
+BaseException 所有异常的基类
+SystemExit 解释器请求退出
+KeyboardInterrupt 用户中断执行(通常是输入^C)
+Exception 常规错误的基类
+StopIteration 迭代器没有更多的值
+GeneratorExit 生成器(generator)发生异常来通知退出
+StandardError 所有的内建标准异常的基类
+ArithmeticError 所有数值计算错误的基类
+FloatingPointError 浮点计算错误
+OverflowError 数值运算超出最大限制
+ZeroDivisionError 除(或取模)零 (所有数据类型)
+AssertionError 断言语句失败
+AttributeError 对象没有这个属性
+EOFError 没有内建输入,到达EOF 标记
+EnvironmentError 操作系统错误的基类
+IOError 输入/输出操作失败
+OSError 操作系统错误
+WindowsError 系统调用失败
+ImportError 导入模块/对象失败
+LookupError 无效数据查询的基类
+IndexError 序列中没有此索引(index)
+KeyError 映射中没有这个键
+MemoryError 内存溢出错误(对于Python 解释器不是致命的)
+NameError 未声明/初始化对象 (没有属性)
+UnboundLocalError 访问未初始化的本地变量
+ReferenceError 弱引用(Weak reference)试图访问已经垃圾回收了的对象
+RuntimeError 一般的运行时错误
+NotImplementedError 尚未实现的方法
+SyntaxError Python 语法错误
+IndentationError 缩进错误
+TabError Tab 和空格混用
+SystemError 一般的解释器系统错误
+TypeError 对类型无效的操作
+ValueError 传入无效的参数
+UnicodeError Unicode 相关的错误
+UnicodeDecodeError Unicode 解码时的错误
+UnicodeEncodeError Unicode 编码时错误
+UnicodeTranslateError Unicode 转换时错误
+Warning 警告的基类
+DeprecationWarning 关于被弃用的特征的警告
+FutureWarning 关于构造将来语义会有改变的警告
+OverflowWarning 旧的关于自动提升为长整型(long)的警告
+PendingDeprecationWarning 关于特性将会被废弃的警告
+RuntimeWarning 可疑的运行时行为(runtime behavior)的警告
+SyntaxWarning 可疑的语法的警告
+UserWarning 用户代码生成的警告
+
+
+
+
+
+
+weddriver 错误截图
+get_screenshot_as_file()函数将截取当前页面的截图保存到指定的位置
+#捕捉百度输入框异常
+try:
+browser.find_element_by_id("kwsss").send_keys("selenium")
+browser.find_element_by_id("su").click()
+except:
+browser.get_screenshot_as_file("/home/fnngj/python/error_png.png")
+
+
+
+
+
+
+引入 unittest 单元测试框架
+
+selenium IDE 界面介绍
+1---文件(File):创建、打开和保存测试案例和测试案例集。
+编辑(Edit):复制、粘贴、删除、撤销和选择测试案例中的所有命令。
+Options (设置): 用于设置 seleniunm IDE。
+2---用来填写被测网站的地址。
+3---速度控制:控制案例的运行速度。
+4---运行所有:运行一个测试案例集中的所有案例。
+5---运行:运行当前选定的测试案例。
+6---暂停/恢复:暂停和恢复测试案例执行。
+7---|单步:可以运行一个案例中的一行命令。
+8---录制:点击之后,开始记录你对浏览器的操作。
+9---案例集列表。
+10---测试脚本;table 标签:用表格形式展现命令及参数。source 标签:用原始方式展现,默
+认是 HTML 语言格式,也可以用其他语言展示。
+11---查看脚本运行通过/失败的个数。
+12---当选中前命令对应参数。
+13---日志/参考/UI 元素/Rollup
+日志:当你运行测试时,错误和信息将会自定显示。
+参考:当在表格中输入和编辑 selenese 命令时,面板中会显示对应的参考文档。
+UI 元素/Rollup:参考帮助菜单中的,UI-Element Documentation。
+
+
+
+
+
+
+
+
+unittest 框架
+
+#coding= utf-8
+# 将要被测试的类
+class Widget:
+    def __init__(self, size = (40, 40)):
+		self._size = size
+    
+    def getSize(self):
+		return self._size
+
+	def resize(self, width, height):
+    	if width < 0 or height < 0:
+			raise ValueError, "illegal size"
+    	self._size = (width, height)
+
+	def dispose(self):
+   		 pass
+
+
+#coding= utf-8
+from widget import Widget
+import unittest
+
+# 执行测试的类
+class WidgetTestCase(unittest.TestCase):
+	def setUp(self):
+		self.widget = Widget()
+
+# 测试 getSize()方法的测试用例
+	def testSize(self):
+		self.assertEqual(self.widget.getSize(), (40, 40))
+
+# 测试 resize()方法的测试用例
+	def testResize(self):
+		self.widget.resize(100, 100)
+		self.assertEqual(self.widget.getSize(), (100, 100))
+
+	def tearDown(self):
+		self.widget.dispose()
+		self.widget = None
+
+def suite():
+	suite = unittest.TestSuite()
+    suite.addTest(WidgetTestCase("testSize")) #只运行"testSize"开头的方法
+    suite.addTest(WidgetTestCase("testResize")) #只运行"testResize"开头的方法
+    unittest.makeSuite(WidgetTestCase, "test") #运行所有以"test"开头的方法
+    unittest.main() #运行所有以"test"开头的方法
+	return suite
+
+在 python 中导入模块一般使用的是 import
+__name__,__name__作为模块的内置属性,简单点说呢,就是.py 文件的调用方式。最后是__main__,刚
+才我也提过,.py 文件有两种使用方式:作为模块被调用和直接使用。如果它等于"__main__"就表示是直接
+执行。
+我们在实际的自动化测试用例开发过程中,首先要保证开发的单个用例文件(.py)是运行通过的,如
+何跑单个文件上的用例,那么就可以在 if __name__ == “__main__”:后面编写执行用的语句,如上面介绍
+的 TextTestRunner()方法来构造测试集,或直接使用 unittest.main()来运行所有用例。
+那么一旦这个用例文件(.py)稳定之后,就需要将这个用例文件添加到用例集中,这个用例文件就被
+做为一个模块被调用;这个时候 if __name__ == “__main__”:后面的内容将不会被执行。
+
+driver.switch_to_alert().accept()
+
+
+"""Time """
+time.time() 获取当前时间戳
+time.localtime() 当前时间的 struct_time 形式
+time.ctime() 当前时间的字符串形式
+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+
+
+
+python 中的 package 必须包含一个__init__.py 的文件。
+
+
+
+
+
+用例的读取
+
+discover 解决用例的读取(用例文件则自动添加到测试套件中)
+all_tests.py
+
+
+
+自动化测试高级应用
+
+自动发邮件功能
+python 的 smtplib 模块提供了一种很方便的途径发送电子邮件。它对 smtp 协议进行了简单的封装。
+
+
+python 多进程/线程基础
+thread.start_new_thread(loop0, ())
+start_new_thread()要求一定要有前两个参数。所以,就算我们想要运行的函数不要参数,我们也
+要传一个空的元组。
+
+
+
+
+threading 模块
+我们应该避免使用 thread 模块,原因是它不支持守护线程。当主线程退出时,所有的子线程不论它
+们是否还在工作,都会被强行退出。有时我们并不期望这种行为,这时就引入了守护线程的概念。 threading
+模块则支持守护线程。
+
+
+multiprocessing 模块
+target 表示调用对象, args 表示调用对象的位置参数元组。 kwargs 表示调用对象的字典。 Name 为别名。
+Group 实质上不使用。
+p = Process(target=f, args=('bob',))
+
