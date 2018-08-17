@@ -720,4 +720,104 @@ multiprocessing 模块
 target 表示调用对象, args 表示调用对象的位置参数元组。 kwargs 表示调用对象的字典。 Name 为别名。
 Group 实质上不使用。
 p = Process(target=f, args=('bob',))
+一台电脑上开的进程不要超过三个,并行执行用例时相互之间会发生一定的干扰
+
+
+
+定时任务
+k=1
+while k <2:
+timing=time.strftime('%H_%M',time.localtime(time.time()))
+if timing == '12_00':
+print u"开始运行脚本:"
+runner.run(alltestnames)
+#执行测试用例
+print u"运行完成退出"
+break
+else:
+time.sleep(5)
+print timing
+
+
+
+
+
+linux 实现 定时任务
+at now+1 minutes
+python file.py
+Ctrl+d 保存退出
+at -l ,atq  两个命令查看 at 创建的任务
+atrm 用于删除已经创建的任务(编号)
+用法:
+指定在今天下午17:30执行某命令(假设现在时间是下午14:30,2014年1月11日)
+命令格式:
+at 5:30pm
+at 17:30
+at 17:20 today
+at now+3 hours
+at now+180 minutes
+at 17:30 14.1.11
+at 17:30 1.11.14
+
+通过 crontab 命令创建任务
+输入 crontab - e 命令进入 crontab 文件
+按键盘 i、o、a 任意一个键进入编辑状态,可以对文件进行修改。
+分钟 小时 天 月 星期 命令/脚本
+5  * * * * python file.py
+
+ctrl+x 离开,提示是否保存任务?按 y 保存任务退出
+启动 crontab 服务:
+注意:在完成编辑以后,要重新启动 cron 进程,crontab 服务操作说明:
+~# /etc/init.d/cron restart //重启服务
+~# /etc/init.d/cron start //启动服务
+~# /etc/init.d/cron stop //关闭服务
+~# /etc/init.d/cron reload //重新载入配置
+
+在以上各个字段中,还可以使用以下特殊字符:
+星号(*):代表所有可能的值,例如 month 字段如果是星号,则表示在满足其它字段的制约条件后每
+月都执行该命令操作。
+逗号(,)
+:可以用逗号隔开的值指定一个列表范围,例如,“1,2,5,7,8,9”
+中杠(-)
+:可以用整数之间的中杠表示一个整数范围,例如“2-6”表示“2,3,4,5,6”
+正斜线(/)
+:可以用正斜线指定时间的间隔频率,例如“0-23/2”表示每两小时执行一次。同时正斜
+线可以和星号一起使用,例如*/10,如果用在 minute 字段,表示每十分钟执行一次。
+
+
+
+
+
+selenium grid2 分布式执行测试用例
+selenium server
+要想在 webdriver 中运行远程环境就必要要安装 selenium server,要想运行 selenium server 同样也
+需要安装 java 环境
+#coding=utf-8
+import time
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+#指定运行主机与端口号
+driver = webdriver.Remote(
+command_executor='http://127.0.0.1:4444/wd/hub',
+desired_capabilities=DesiredCapabilities.CHROME)
+driver.get("http://www.youdao.com")
+driver.find_element_by_name("q").send_keys("hello")
+driver.find_element_by_id("qb").click()
+time.sleep(2)
+driver.close()
+
+
+
+行为驱动开发 BDD 框架 lettuce 入门
+安装 lettuce
+[sudo] pip install lettuce
+
+安装 lettuce_webdriver
+[sudo] pip install lettuce
+
+
+
+
+
+
 
